@@ -14,6 +14,7 @@
           <element id="module-output" name="SpringMyBatisJPA" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.30" />
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:4.3.18.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-aop:4.3.18.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-beans:4.3.18.RELEASE" />
@@ -31,7 +32,6 @@
           <element id="library" level="project" name="Maven: org.springframework.data:spring-data-commons:2.2.5.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-orm:5.2.4.RELEASE" />
           <element id="library" level="project" name="Maven: org.aspectj:aspectjrt:1.9.5" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.26" />
           <element id="library" level="project" name="Maven: org.hibernate:hibernate-entitymanager:5.4.10.Final" />
           <element id="library" level="project" name="Maven: org.jboss.logging:jboss-logging:3.3.2.Final" />
           <element id="library" level="project" name="Maven: org.hibernate:hibernate-core:5.4.10.Final" />
