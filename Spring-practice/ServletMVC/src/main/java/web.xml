@@ -1,0 +1,41 @@
+<web-app>
+    <!--
+    <listener>
+    <listener-class>org.example.MyListener</listener-class>
+    </listener> -->
+
+    <!--ContextLoaderListener는 애플리케이션 컨텍스트를 만들어 서블릿 컨텍스트에 등록하는 역할-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!-- 애플리케이션 컨텍스트 등록 -->
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </context-param>
+    <!-- Java 설정 파일 위치 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>org.example.AppConfig</param-value>
+    </context-param>
+    <servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>org.example.HelloServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>myFilter</filter-name>
+        <filter-class>org.example.MyFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <!-- 적용 서블릿 이름 (만약 여러 개의 서블릿에 적용할 시 url-pattern으로 설정한다.)-->
+        <servlet-name>hello</servlet-name>
+    </filter-mapping>
+</web-app>
