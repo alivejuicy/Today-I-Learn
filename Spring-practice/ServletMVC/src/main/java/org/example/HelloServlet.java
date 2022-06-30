@@ -16,8 +16,8 @@ public class HelloServlet extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ApplicationContext context = (ApplicationContext) getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
-        HelloService helloService = context.getBean(HelloService.class);
+        ApplicationContext context = (ApplicationContext) getServletContext().getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE); //스프링 컨테이너에 서블릿 컨텍스트 연결 및 가져오기
+        HelloService helloService = context.getBean(HelloService.class); //스프링컨테이너에서 등록된 service의 bean을 가져온다.
         String name = helloService.getName();
 
 
