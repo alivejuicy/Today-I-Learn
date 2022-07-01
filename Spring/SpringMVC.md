@@ -19,7 +19,7 @@ MVC란 `Model-View-Controller`의 약자로 애플리케이션을 세 가지 역
 이 MVC 패턴의 방식으로는 두 가지가 있다.
 
 
----
+
 
 ## Model 1
 ![](https://velog.velcdn.com/images/alivejuicy/post/6d8a6076-f6a4-4da7-8593-a88c748460d2/image.png)
@@ -33,11 +33,11 @@ JavaBean Service Class를 사용하여 웹 브라우저 사용자가 요청한 �
 ![](https://velog.velcdn.com/images/alivejuicy/post/e6b314af-8651-4652-bde1-cd5850774f4d/image.png)
 **Model 2** 방식은 웹 브라우저 사용자의 요청을 서블릿이 받고 서블릿은 해당 요청으로 View로 보여줄 것인지 Model로 보낼 것인지를 판단하여 전송한다. 또한 `HTML` Source와 `JAVA` Source를 분리해놓았기 때문에 Model 1 방식에 비해 확장시키기도 쉽고 유지보수 또한 쉬운 특징이 있다. 이 방식을 이해하면서 Spring MVC를 시작해보자.
 
----
+
 # Spring MVC?
 `Spring MVC`는 위에 정리한 **MVC Pattern**을 따르는 Servlet 기반의 프레임워크라 할 수 있다. `Model 2` 아키텍처를 적용하여 만들어졌으며 유연한 아키텍처 구성 및 큰 규모의 시스템을 개발할 때 적합한 프레임워크이다.
 
----
+
 ## Spring MVC 구조
 ![](https://terasolunaorg.github.io/guideline/5.0.1.RELEASE/en/_images/RequestLifecycle.png)
 
@@ -56,3 +56,59 @@ JavaBean Service Class를 사용하여 웹 브라우저 사용자가 요청한 �
 
 
 한 눈에 봐서는 이해하기 어려울 수 있지만 요청과 처리 방식을 각각 분리한 구조인 것을 확인 할 수 있었고 Spring MVC 구조에서 `Dispatcher-Servlet`은 Spring MVC의 핵심 요소이다. 저번 학습에서 `Dispatch-Servlet`는 클라이언트에서 웹 요청 시, `Dispatcher-Servlet`에서 이루어지는 동작의 흐름은 `Front Controller`의 역할을 한다고 알 수 있었다.
+<br/>
+
+# WAS에서 Client의 요청 처리
+
+### WAS(Web Applicatoin Server)
+일반적인 웹서버(Web Server)는 정적인 처리만을 다룬다. 
+그러나 __Web Application Server__`(Tomcat)`은  웹서버와는 다르게 DB연결, 다른 응용프로그램과 상호 작용 등 동적인 기능들을 사용할 수 있다. Tomcat은 Apache 웹서버의 일부 기능 + Web container 조합으로, 웹서버의 정적 데이터 처리 기능과 동적 데이터 처리 기능 모두를 포함하고 있다. 하나의 톰캣은 하나의 __JVM__을 가지는 특징이 있다.
+
+![](https://velog.velcdn.com/images/alivejuicy/post/e3b94a5c-dbed-4d1e-bab6-d10f4081fb42/image.png)
+### WAS(Tomcat)에서부터 Spring MVC 프레임워크의 클라이언트 요청 처리 단계 살펴보기
+
+>
+1. Client에서 WAS에 내장된 웹서버에 HttpRequest가 들어온다.
+2. 웹서버에서 요청을 Servlet container로 전달한다.
+3. Servlet container는 각 요청별로 thread를 생성한다. 혹여 Servlet container에 Dispatcher-Servlet 인스턴스가 존재하지 않을 경우 디스패처 서블릿을 생성하고 init() 메소드를 호출한다. 
+5. thread에서는 Dispatcher-Servlet의 service() 메소드를 호출한다.
+6. Dispatcher-Servlet은 `HandlerMapping`을 통해 요청을 `Mapping(=위임)`할 `Handler(Controller)`를 조회한다.
+7. 조회된 `Handler(Controller)`를 실행할 수 있는 HandlerAdapter를 탐색한다.
+8. 탐색된 HandlerAdapter를 통해 Mapping한 Handler를 호출하여 요청을 처리한다.
+이때 Controller는 요청 처리 후 반환값은 `Model(Service & DAO)`과 `View`를 받는 것이다.
+9. [이하 과정 같음](https://velog.io/@alivejuicy/Spring-Spring-MVC-1)
+
+여기서 알 수 있는 점은 Dispatcher-Servlet은 결론적으로 Spring Framework에서 제공하는 `HandlerMapping`, `HandlerAdapter`, `ViewResolver` 같은 전략 인터페이스들의 구현체를 받아서 사용하는 것이다. 즉 요청을 받으면 필요한 공통된 처리를 한 후, 요청에 맞는 Handler를 조회 및 위임하는 과정을 거친 뒤 Handler의 실행 결과를 HttpResponse 형태로 만드는 역할을 하는 것이다. 각 인터페이스들의 정의와 구현체들을 살펴보자
+
+### HandlerMapping 
+
+Client의 Request URL과 매칭되어 요청을 처리할 핸들러를 선택하는 역할을 수행하는 인터페이스이다. HandlerMapping은 인터페이스이고 이것을 이용한 여러 구현체가 존재한다.
+>
+**BeanNameUrlHandlerMapping**
+URL과 일치하는 이름을 갖는 빈의 `이름`을 컨트롤러로 매핑하는 방법.
+**ControllerBeanNameHandlerMapping**
+URL과 일치하는 이름을 갖는 빈의 `아이디`를 컨트롤러로 사용하는 방법.
+**SimpleUrlHandlerMapping**
+URL패턴에 매핑되는 지정된 컨트롤러를 사용하는 방법, 위 2가지는 하나의 Controller에 하나의 URL을 매핑하는 방법이지만 이건 하나의 Controller에 여러 URL 매핑이 가능한 방법이다.
+**RequestMappingHandlerMapping**
+@RequestMapping을 이용한 매핑 방법이며 주로 사용하는 전략이다. 어노테이션을 통해 URL과 컨트롤러를 매핑한다. 이 방법은 컨트롤러 내 메소드와도 매핑이 가능하다.
+
+Handler Mapping은 1개 이상 동시에 사용이 가능하다. 1개 Mapping으로 통일하는 것이 보편적이나 2개 이상 매핑의 경우 URL이 중복 매치될 수 있다. 그럴 경우 ORDER PROPERTY를 통해 Mapping 우선 순위를 지정할 수 있다.
+
+### HandlerAdapter
+
+HandlerMapping이 위임한 Handler(Controller)를 호출하고 처리하는 인터페이스를 뜻한다.
+Spring에서는 4가지 방식의 컨트롤러를 지원하며 각 Controller를 연결해주는 Adapter가 있어야 한다. 
+
+> **RequestMappingHandlerAdapter**
+@RequestMapping annotation을 처리한다.
+**HttpRequestHandlerAdapter**
+HttpRequestHandler를 처리한다.
+**SimpleControllerHandlerAdapter**
+컨트롤러 인터페이스를 처리한다.
+
+### View
+뷰는 MVC 아키텍처에서 Model이 가진 정보를 어떻게 표현해야 하는지에 대한 logic을 가지고 있는 Component이다.
+
+### ViewResolver
+컨트롤러에서 반환하는 View 이름에 해당하는 View를 찾아내는 인터페이스이다.
